@@ -14,16 +14,16 @@ connection.connect(err =>{
     console.log(`Connect on thread ${connection.threadId}`)
     initialPrompts()
 })
-function initialPrompts(){
+function initialPrompts() {
     inquirer.prompt([
         {
-            name:'action',
+            name: 'action',
             message: 'What do you wanna do?',
-            type:'list',
-            choices:['ARTIST SEARCH','MULTI SEARCH','RANGE SEARCH','SONG SEARCH','EXIT']
+            type: 'list',
+            choices: ['ARTIST SEARCH', 'MULTI SEARCH', 'RANGE SEARCH', 'SONG SEARCH', 'EXIT']
         }
     ]).then(answer => {
-        switch(answer.action){
+        switch (answer.action) {
             case 'ARTIST SEARCH':
                 artistSearch()
                 break
@@ -34,7 +34,7 @@ function initialPrompts(){
                 rangeSearch()
                 break
             case 'SONG SEARCH':
-               songSearch()
+                songSearch()
                 break
             default:
                 connection.end()
@@ -44,8 +44,19 @@ function initialPrompts(){
 }
 
 function artistSearch(){
-    console.log('Searching artist...')
-    initialPrompts()    
+    inquirer.prompt([{
+        message:'Which artist are you looking for?',
+        name:'artist'
+    }]).then(answer => {
+        connection.query(
+            'SELECT position, artist, song, year FROM top5000 WHERE ?',
+        {artist: answer.artist},
+            (err,results)=>{
+            if(err) throw err
+            console.table(results)
+            initialPrompts()    
+        })
+    })
 }
 function multiSearch(){
     console.log('MultiSearch...')
